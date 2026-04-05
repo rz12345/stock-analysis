@@ -5,4 +5,5 @@ app/configs/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-.claude/
+.claude/*
+!.claude/CLAUDE.md
