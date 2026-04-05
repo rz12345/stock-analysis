@@ -92,6 +92,9 @@ class BaseStrategy(ABC):
         elif method_name == 'bt_ma_pullback':
             stock_data = self.calculate_ma_pullback(stock_data)
             stock_data['buy_signal'] = stock_data['MA_pullback_signal']
+        elif method_name == 'bt_monthly_dca':
+            stock_data = self.calculate_monthly_dca(stock_data)
+            stock_data['buy_signal'] = stock_data['monthly_dca_signal']
 
         if stock_data[stock_data['buy_signal'] == 1]['buy_signal'].count() == 0: 
             return None
@@ -235,6 +238,19 @@ class BaseStrategy(ABC):
             MA=ma,
             MA_pullback_signal=crossed_above,
         )
+
+    def calculate_monthly_dca(self, stock_data: pd.DataFrame) -> pd.DataFrame:
+        """
+        每月定期定額策略：每月第一個交易日產生買入訊號。
+
+        :param stock_data: 股票數據
+        :return: 包含 monthly_dca_signal 的股票數據
+        """
+        first_trading_day = stock_data.groupby(
+            stock_data['date'].dt.to_period('M')
+        )['date'].transform('min')
+        signal = stock_data['date'] == first_trading_day
+        return stock_data.assign(monthly_dca_signal=signal)
 
     def calculate_macd_and_rsi(self, stock_data: pd.DataFrame) -> pd.DataFrame:
         stock_data['MACD'] = stock_data[self.CLOSED_PRICE_COLUMN].ewm(span=12, adjust=False).mean() - stock_data[self.CLOSED_PRICE_COLUMN].ewm(span=26, adjust=False).mean()

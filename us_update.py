@@ -40,4 +40,5 @@ if __name__ == "__main__":
         Strategy.bt_strategy(df_stock, 'bt_dividend')
         Strategy.bt_strategy(df_stock, 'bt_signals')
         Strategy.bt_strategy(df_stock, 'bt_ma_pullback')
+        Strategy.bt_strategy(df_stock, 'bt_monthly_dca')
         

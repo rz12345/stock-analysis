@@ -7,7 +7,7 @@ import pandas as pd
 
 class WebDataSync(ABC):
     # 預設的查詢天數
-    DAYS = 14
+    DAYS = 30
     PREFIX_URI = None
 
     @property

@@ -60,10 +60,10 @@ if __name__ == "__main__":
     TWReport.run()
     
     reports = [USReport, TWReport]
-    methods = ['bt_dividend', 'bt_signals']
+    methods = ['bt_dividend', 'bt_signals', 'bt_monthly_dca']
     output_files = [
-        ['output/US_Summary_Dividend.png', 'output/US_Summary_Signals.png'],
-        ['output/TW_Summary_Dividend.png', 'output/TW_Summary_Signals.png']
+        ['output/US_Summary_Dividend.png', 'output/US_Summary_Signals.png', 'output/US_Summary_MonthlyDCA.png'],
+        ['output/TW_Summary_Dividend.png', 'output/TW_Summary_Signals.png', 'output/TW_Summary_MonthlyDCA.png'],
     ]
 
     # 生成台股、美股彙總表
