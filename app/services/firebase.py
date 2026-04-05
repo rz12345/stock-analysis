@@ -4,8 +4,13 @@ import pandas as pd
 from firebase_admin import credentials
 from firebase_admin import db
 
-class Firebase:    
-    DB_URL = 'https://jojocat-stock-analysis-default-rtdb.asia-southeast1.firebasedatabase.app/'
+def _load_firebase_config():
+    with open("app/configs/firebase_config.json", "r") as f:
+        return json.load(f)
+
+class Firebase:
+    _config = _load_firebase_config()
+    DB_URL = _config["db_url"]
     CRED = credentials.Certificate("app/configs/firebase-cred.json")
     
     #def __init__(self):
