@@ -1,4 +1,6 @@
+import json
 import logging
+from pathlib import Path
 
 import pandas as pd
 from app.repositories.base_strategy import TwStrategy
@@ -19,24 +21,8 @@ if __name__ == "__main__":
         # 初始日期
         start_date = '2020-01-01'
 
-        focus_stocks = [
-            # 市值型ETF:
-            '0050',   # 元大台灣50
-            '006208', # 富邦台灣采吉50基金 https://www.wantgoo.com/stock/etf/006208/constituent
-            '00922',  # 國泰台灣領袖50 https://www.wantgoo.com/stock/etf/00922/constituent
-            '00923',  # 群益台ESG低碳50 https://www.wantgoo.com/stock/etf/00923
-            '00692',  # 富邦公司治理 https://www.wantgoo.com/stock/etf/00692/constituent
-            '00733',  # 富邦臺灣中小
-            '00926',  # 凱基全球菁英55 https://www.wantgoo.com/stock/etf/00926/constituent
-
-            # 高股息型ETF:
-            '0056',   # 元大高股息
-            '00878',  # 國泰永續高股息
-            '00915',  # 凱基優選高股息30 https://www.wantgoo.com/stock/etf/00915/constituent
-            '00713',  # 元大台灣高息低波
-            '00919',  # 群益台灣精選高息
-            '00929',  # 復華台灣科技優息
-        ]
+        stocks_config = json.loads(Path('stocks.json').read_text(encoding='utf-8'))
+        focus_stocks = stocks_config['tw']
         for stock_id in focus_stocks:
             logger.info("擷取:%s  起始日:%s", stock_id, start_date)
 

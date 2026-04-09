@@ -1,4 +1,6 @@
+import json
 import logging
+from pathlib import Path
 
 import pandas as pd
 from app.repositories.base_strategy import UsStrategy
@@ -18,19 +20,8 @@ if __name__ == "__main__":
         # 初始日期
         start_date = '2020-01-01'
 
-        focus_stocks = [
-            'VOO',
-            'QQQ',
-            'VT',
-            'VTI',
-            'XLF',
-            'XLP',
-            'XLV',
-            'IJH',
-            'IJR',
-            'IWM',
-            'NVDA',
-        ]
+        stocks_config = json.loads(Path('stocks.json').read_text(encoding='utf-8'))
+        focus_stocks = stocks_config['us']
         for stock_id in focus_stocks:
             logger.info("擷取:%s  起始日:%s", stock_id, start_date)
 
