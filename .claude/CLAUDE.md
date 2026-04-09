@@ -36,7 +36,7 @@ stock-analysis/
 │   └── services/             # 外部服務整合
 │       ├── firebase.py
 │       ├── telegram_notify.py
-│       ├── line_notify.py        # 保留但未使用
+│       ├── app_logger.py         # 日誌服務（本地檔案 + Telegram 錯誤通知）
 │       └── twse.py
 ├── data/
 │   ├── tw/                   # 台股快取（CSV + db.sqlite）

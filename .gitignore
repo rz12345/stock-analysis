@@ -1,6 +1,7 @@
 tmp/
 output/
 data/
+logs/
 app/configs/
 __pycache__/
 *.pyc
