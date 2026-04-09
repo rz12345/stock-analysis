@@ -12,6 +12,7 @@ from io import BytesIO
 import os
 import math
 from PIL import Image, ImageDraw, ImageFont
+from app.utils.formatting import format_float
 
 class BaseReport(ABC):
     TABLE_STYLE = [
@@ -46,13 +47,13 @@ class BaseReport(ABC):
         chart_img_buffer = __class__.plot_strategy_graph(df_transaction, stock_id, method)
 
         df_transaction.columns = ['Date','Close','Position\n Size','Position\n Price','Position\n Value','Broker\n Dividend','Asset\n Value']
-        df_transaction = df_transaction.applymap(__class__.format_float)
+        df_transaction = df_transaction.map(format_float)
         transaction_table_img_buffer = __class__.plot_table(df_transaction)
         
         df_summary.columns = ['Date','Close','Position\n Value','Broker\n Dividend','Asset\n Value','ROI','IRR']
         df_summary['IRR'] = (df_summary['IRR'] * 100).round(2).astype(str) + '%'
         df_summary['ROI'] = (df_summary['ROI'] * 100).round(2).astype(str) + '%'
-        df_summary = df_summary.applymap(__class__.format_float)
+        df_summary = df_summary.map(format_float)
         summary_table_img_buffer = __class__.plot_table(df_summary)
         
         #__class__.generate_pdf(stock_id, method, df_transaction, df_summary, img_buffer)        
@@ -193,13 +194,6 @@ class BaseReport(ABC):
         print(f"Image file '{img_filename}' created successfully.")
         
         
-    """
-    將浮點數格式化為保留兩位小數
-    """
-    def format_float(value) -> str:
-        if isinstance(value, float):
-            return '{:.2f}'.format(value)
-        return value
 
     def run(self) -> None:
         try:

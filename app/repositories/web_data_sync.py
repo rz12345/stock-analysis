@@ -1,9 +1,33 @@
 import sqlite3
+import time
+import logging
 from pathlib import Path
 from abc import ABC, abstractmethod
 from app.services.firebase import Firebase as DB
 from datetime import datetime, timedelta
 import pandas as pd
+from app.utils.formatting import format_float
+
+logger = logging.getLogger(__name__)
+
+_RETRY_ATTEMPTS = 3
+_RETRY_BACKOFF = 2  # seconds; doubles on each attempt
+
+
+def _sync_with_retry(node_ref: str, data) -> None:
+    """Call DB.updateNodeByDict with exponential-backoff retry."""
+    delay = _RETRY_BACKOFF
+    for attempt in range(1, _RETRY_ATTEMPTS + 1):
+        try:
+            DB.updateNodeByDict(node_ref, data)
+            return
+        except Exception:
+            if attempt == _RETRY_ATTEMPTS:
+                logger.error("Firebase 同步失敗（已重試 %d 次）：%s", _RETRY_ATTEMPTS, node_ref, exc_info=True)
+                raise
+            logger.warning("Firebase 同步失敗，%d 秒後重試（第 %d/%d 次）：%s", delay, attempt, _RETRY_ATTEMPTS, node_ref)
+            time.sleep(delay)
+            delay *= 2
 
 class WebDataSync(ABC):
     # 預設的查詢天數
@@ -15,14 +39,6 @@ class WebDataSync(ABC):
         if self.PREFIX_URI is None:
             raise NotImplementedError("PREFIX_URI must be defined in the subclass.")
         return Path(f'data/{self.PREFIX_URI}/db.sqlite')
-
-    def format_float(value):
-        if isinstance(value, float):
-            if value < 1:
-                return '{:.4f}'.format(value)
-            else:
-                return '{:.2f}'.format(value)
-        return value
 
     def get_transaction_logs(self, row):
         stock_id = row['stock_id']
@@ -56,7 +72,7 @@ class WebDataSync(ABC):
             """
             df_recent = pd.read_sql_query(query, conn)
                     
-        DB.updateNodeByDict(f'{self.PREFIX_URI}/recent_transaction_logs', df_recent.to_dict('records'))
+        _sync_with_retry(f'{self.PREFIX_URI}/recent_transaction_logs', df_recent.to_dict('records'))
         
         # 查詢所有的 method
         with sqlite3.connect(self.DB_PATH) as conn:
@@ -79,20 +95,20 @@ class WebDataSync(ABC):
                     ORDER BY bs.stock_id
                 '''
                 df_method = pd.read_sql_query(query, conn)
-                df_method = df_method.applymap(__class__.format_float)
+                df_method = df_method.map(format_float)
 
             # 將 query 結果轉存至 firebase realtime database
             data_method_summaries = df_method.to_dict('records')
             data_method_transaction_logs = {}
-            
+
             for index, row in df_method.iterrows():
                 s = self.get_transaction_logs(row)
-                s = s.applymap(__class__.format_float)
+                s = s.map(format_float)
                 stock_id = s.stock_id.values[0]
                 data_method_transaction_logs[stock_id] = s.to_dict('records')
 
-            DB.updateNodeByDict(f'{self.PREFIX_URI}/{method}/summaries', data_method_summaries)
-            DB.updateNodeByDict(f'{self.PREFIX_URI}/{method}/transaction_logs', data_method_transaction_logs)
+            _sync_with_retry(f'{self.PREFIX_URI}/{method}/summaries', data_method_summaries)
+            _sync_with_retry(f'{self.PREFIX_URI}/{method}/transaction_logs', data_method_transaction_logs)
 
 class USWebData(WebDataSync):
     PREFIX_URI = 'us'
