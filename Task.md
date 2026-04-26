@@ -53,11 +53,11 @@
   - `us_update.py`：新增 `bt_monthly_dca` 呼叫
   - `summary_table.py`：`methods` 與 `output_files` 新增對應項目
 
-- [x] **建立 `.claude/CLAUDE.md`**：專案概述、架構、策略說明、DB schema、開發規則
+- [x] **建立 `CLAUDE.md`**：專案概述、架構、策略說明、DB schema、開發規則
 
-- [x] **建立 `.claude/Task.md`**：已完成任務清單
+- [x] **建立 `Task.md`**：已完成任務清單
 
-- [x] **建立 `.claude/Todo.md`**：待辦任務清單
+- [x] **建立 `Todo.md`**：待辦任務清單
 
 ---
 

@@ -1,0 +1,9 @@
+pandas
+numpy
+requests
+firebase-admin
+FinMind
+matplotlib
+reportlab
+Pillow
+pytest
